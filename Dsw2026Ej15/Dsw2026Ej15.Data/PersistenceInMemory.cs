@@ -3,40 +3,37 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
-using Dsw2026Ej15.Data.Interfaces;
+using Dsw2026Ej15.Domain.Interfaces;
+using Dsw2026Ej15.Data.Dtos;
 
 namespace Dsw2026Ej15.Data;
 
 public class PersistenceInMemory: IPersistence
 {
-    private readonly List<Speciality> _specialities = new List<Speciality>();
-    private readonly List<Doctor> _doctors = new List<Doctor>();
+    private List<Speciality> _specialities = [];
+    private List<Doctor> _doctors = [];
 
-    private static async Task<IEnumerable<Speciality>> LoadSpecialities()
+    private void LoadSpecialities()
     {
-        var json = await File.ReadAllTextAsync("specialities.json");
-        var specialities = JsonSerializer.Deserialize<List<Speciality>>(json);
-        return specialities ?? new List<Speciality>();
+        try {
+            string jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Sources" ,"specialities.json");
+            var json = File.ReadAllText(jsonPath);
+            var specialities = JsonSerializer.Deserialize<List<SpecialityDto>>(json, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? [];
+            _specialities = [.. specialities.Select(s => new Speciality(s.Name, s.Description, s.Id))];
+        }
+        catch (Exception)
+        {
+
+        }
     }
     public void InitializeDoctors()
     {
         throw new NotImplementedException();
     }
-    public void InitializeSpecialities()
-    {
-        var specialities = LoadSpecialities().Result;
-        if(specialities != null)
-        {
-            foreach (var speciality in specialities)
-            {
-                _specialities.Add(speciality);
-            }
-        }
-    }
     public void InitializeData()
     {
         InitializeDoctors();
-        InitializeSpecialities();
+        LoadSpecialities();
     }
     public List<Doctor> GetDoctors()
     {
@@ -47,7 +44,7 @@ public class PersistenceInMemory: IPersistence
         return _specialities;
     }
 
-    public bool AddDoctor(Doctor doctor)
+    public bool CreateDoctor(Doctor doctor)
     {
         try
         {
@@ -71,12 +68,12 @@ public class PersistenceInMemory: IPersistence
             return false;
         }
     }
-    public Doctor GetDoctor(string licenseNumber)
+    public Doctor? GetDoctor(Guid Id)
     {
-        return _doctors.FirstOrDefault(d => d.LicenseNumber == licenseNumber);
+        return _doctors.FirstOrDefault(d => d.Id == Id);
     }
-    public Speciality GetSpeciality(string name)
+    public Speciality? GetSpeciality(Guid Id)
     {
-        return _specialities.FirstOrDefault(s => s.Name == name);
+        return _specialities.SingleOrDefault(s => s.Id == Id);
     }
 }

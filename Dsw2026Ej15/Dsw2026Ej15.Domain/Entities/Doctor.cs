@@ -11,11 +11,11 @@ public class Doctor: BaseEntity
     public bool IsActive { get; init; }
     public Speciality? Speciality { get; init; }
 
-    public Doctor(string? name, string? licenseNumber, bool isActive, Speciality? speciality, Guid? id = null) : base(id)
+    public Doctor(string? name, string? licenseNumber, Speciality? speciality, Guid? id = null) : base(id)
     {
         Name = name;
         LicenseNumber = licenseNumber;
-        IsActive = isActive;
+        IsActive = true;
         Speciality = speciality;
     }
 }

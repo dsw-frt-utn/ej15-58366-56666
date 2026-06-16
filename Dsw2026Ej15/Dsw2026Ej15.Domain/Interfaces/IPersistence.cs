@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Dsw2026Ej15.Data.Interfaces;
+namespace Dsw2026Ej15.Domain.Interfaces;
 
 public interface IPersistence
 {
@@ -12,8 +12,8 @@ public interface IPersistence
     List<Speciality> GetSpecialities();
     List<Doctor> GetDoctors();
     void InitializeData();
-    bool AddDoctor(Doctor doctor);
+    bool CreateDoctor(Doctor doctor);
     bool AddSpeciality(Speciality speciality);
-    Doctor GetDoctor(string licenseNumber);
-    Speciality GetSpeciality(string name);
+    Doctor? GetDoctor(Guid Id);
+    Speciality? GetSpeciality(Guid Id);
 }

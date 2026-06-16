@@ -1,33 +1,65 @@
+﻿using Dsw2026Ej15.Api.Models;
+using Dsw2026Ej15.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Dsw2026Ej15.Domain.Entities;
+
 namespace Dsw2026Ej15.Api.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/doctors")]
 public class DoctorsController : ControllerBase
 {
-    [Route("api/doctors")]
-    [HttpPost("Insertar Doctor")]
-    public void Post(Doctor doctor)
+    private readonly IPersistence _persistence;
+
+    [HttpPost("Crear Medico")]
+    public async Task<IActionResult> CreateDoctor([FromBody] DoctorModel.Request request)
     {
-        
+        if(string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.LicenseNumber))
+        {
+            return BadRequest("Nombre y Matricula son requeridos");
+        }
+        var speciality = _persistence.GetSpeciality(request.SpecialityId);
+        if(speciality  == null)
+        {
+            return BadRequest();
+        }
+        return Created();
     }
-    [Route("api/doctors")]
     [HttpGet("Obtener Medicos")]
-    public IEnumerable<Doctor> Get()
+    public async Task<IActionResult> GetDoctors()
     {
-        
+        try
+        {
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
-    [Route("api/doctors/{id}")]
+    [Route("{id}")]
     [HttpGet("Obtener Medico")]
-    public Doctor Get(int id)
+    public async Task<IActionResult> Get(int id)
     {
-
+        try
+        {
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
-    [Route("api/doctors/{id}")]
+    [Route("{id}")]
     [HttpDelete("Inhabilitar Medico")]
-    public void Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-
+        try
+        {
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
-}
+}}

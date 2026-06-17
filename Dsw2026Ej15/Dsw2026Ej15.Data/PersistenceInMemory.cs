@@ -13,67 +13,34 @@ public class PersistenceInMemory: IPersistence
     private List<Speciality> _specialities = [];
     private List<Doctor> _doctors = [];
 
-    private void LoadSpecialities()
+    private async Task LoadSpecialitiesAsync()
     {
         try {
             string jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Sources" ,"specialities.json");
-            var json = File.ReadAllText(jsonPath);
+            var json = await File.ReadAllTextAsync(jsonPath);
             var specialities = JsonSerializer.Deserialize<List<SpecialityDto>>(json, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? [];
             _specialities = [.. specialities.Select(s => new Speciality(s.Name, s.Description, s.Id))];
         }
-        catch (Exception)
-        {
-
-        }
-    }
-    public void InitializeDoctors()
-    {
-        throw new NotImplementedException();
-    }
-    public void InitializeData()
-    {
-        InitializeDoctors();
-        LoadSpecialities();
-    }
-    public List<Doctor> GetDoctors()
-    {
-        return _doctors;
-    }
-    public List<Speciality> GetSpecialities()
-    {
-        return _specialities;
-    }
-
-    public bool CreateDoctor(Doctor doctor)
-    {
-        try
-        {
-            _doctors.Add(doctor);
-            return true;
-        }
         catch (Exception ex)
         {
-            return false;
+            throw new InvalidOperationException("Error al cargar las especialidades", ex);
         }
     }
-    public bool AddSpeciality(Speciality speciality)
+    public Task<List<Doctor>> GetDoctorsAsync() => Task.FromResult(_doctors);
+    public Task<List<Speciality>> GetSpecialitiesAsync() => Task.FromResult(_specialities);
+
+    public Task CreateDoctorAsync(Doctor doctor)
     {
-        try
-        {
-            _specialities.Add(speciality);
-            return true;
-        }
-        catch (Exception ex)
-        {
-            return false;
-        }
+        _doctors.Add(doctor);
+        return Task.CompletedTask;
     }
-    public Doctor? GetDoctor(Guid Id)
+    public Task<Doctor?> GetDoctorAsync(Guid Id) => Task
+        .FromResult(_doctors.FirstOrDefault(d => d.Id == Id));
+    public Task<Speciality?> GetSpecialityAsync(Guid Id) => Task.FromResult(_specialities.SingleOrDefault(s => s.Id == Id));
+
+    public Task DeleteDoctorAsync(Doctor doctor)
     {
-        return _doctors.FirstOrDefault(d => d.Id == Id);
-    }
-    public Speciality? GetSpeciality(Guid Id)
-    {
-        return _specialities.SingleOrDefault(s => s.Id == Id);
+        doctor.IsActive = false;
+        return Task.CompletedTask;
     }
 }

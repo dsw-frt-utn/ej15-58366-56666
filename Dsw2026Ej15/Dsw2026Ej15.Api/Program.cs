@@ -1,3 +1,4 @@
+using Dsw2026Ej15.Api.Middleware;
 using Dsw2026Ej15.Data;
 using Dsw2026Ej15.Domain.Interfaces;
 
@@ -12,7 +13,7 @@ public class Program
         builder.Services.AddControllers();
         builder.Services.AddSwaggerGen();
         builder.Services.AddSingleton<IPersistence, PersistenceInMemory>();
-
+        builder.Services.AddHealthChecks();
         var app = builder.Build();
 
         if (app.Environment.IsDevelopment())
@@ -20,11 +21,11 @@ public class Program
             app.UseSwagger();
             app.UseSwaggerUI();
         }
-
+       
+        app.UseMiddleware<ExceptionHandlingMiddleware>();
         app.UseAuthorization();
-
+        app.MapGet("/health-check", () => Results.Ok("Healthy"));
         app.MapControllers();
-
         app.Run();
     }
 }

@@ -17,16 +17,18 @@ public class DoctorsController : AppController
     [HttpPost]
     public async Task<IActionResult> CreateDoctor([FromBody] DoctorModel.Request request)
     {
-        if (string.IsNullOrWhiteSpace(request.Name))
-            throw new ValidationException("Name es requerido.");
-
-        if (string.IsNullOrWhiteSpace(request.LicenseNumber))
-            throw new ValidationException("LicenseNumber es requerido.");
+        if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.LicenseNumber))
+          { 
+            throw new ValidationException("Nombre y Matricula son requeridos");
+           }
 
         var speciality = _persistence.GetSpeciality(request.SpecialityId);
         if (speciality == null)
-            throw new ValidationException("SpecialityId no corresponde a ninguna especialidad existente.");
-
+        {   
+            throw new ValidationException("Especialidad no Existe");
+        }
+       
+        
         _persistence.SaveDoctor(new Doctor(request.Name, request.LicenseNumber, speciality));
         return Created();
     }
@@ -42,7 +44,7 @@ public class DoctorsController : AppController
         var doctor = _persistence.GetDoctor(id);
         if(doctor == null || doctor.IsActive == false)
         {
-            return NotFound("Médico no encontrado");
+            throw new NotFoundException("Médico no encontrado o inactivo.");
         }
         return Ok(new {doctor.Name, doctor.LicenseNumber, SpecialityName = doctor.Speciality.Name});
     }
@@ -52,7 +54,7 @@ public class DoctorsController : AppController
         var doctor = _persistence.GetDoctor(id);
         if(doctor == null || doctor.IsActive == false)
         {
-            return NotFound("Médico no encontrado");
+            throw new NotFoundException("Médico no encontrado o ya se encuentra inactivo.");
         }
         _persistence.DeleteDoctor(doctor);
         return NoContent();

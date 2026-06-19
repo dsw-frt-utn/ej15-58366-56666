@@ -5,9 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Dsw2026Ej15.Api.Controllers;
 
-[ApiController]
-[Route("api/doctors")]
-public class DoctorsController : ControllerBase
+public class DoctorsController : AppController
 {
     private readonly IPersistence _persistence;
 
@@ -23,24 +21,24 @@ public class DoctorsController : ControllerBase
         {
             return BadRequest("Nombre y Matricula son requeridos");
         }
-        var speciality = await _persistence.GetSpecialityAsync(request.SpecialityId);
+        var speciality = _persistence.GetSpeciality(request.SpecialityId);
         if(speciality  == null)
         {
             return BadRequest("Especialidad no encontrada");
         }
-        await _persistence.CreateDoctorAsync(new Doctor(request.Name, request.LicenseNumber, speciality));
+        _persistence.SaveDoctor(new Doctor(request.Name, request.LicenseNumber, speciality));
         return Created();
     }
     [HttpGet]
     public async Task<IActionResult> GetDoctors()
     {
-        var doctors = (await _persistence.GetDoctorsAsync()).Where(d => d.IsActive == true);
+        var doctors = _persistence.GetDoctors().Where(d => d.IsActive == true);
         return Ok(doctors);
     }
     [HttpGet("{id}")]
-    public async Task<IActionResult> Get([FromRoute] Guid id)
+    public async Task<IActionResult> GetDoctorById([FromRoute] Guid id)
     {
-        var doctor = await _persistence.GetDoctorAsync(id);
+        var doctor = _persistence.GetDoctor(id);
         if(doctor == null || doctor.IsActive == false)
         {
             return NotFound("Médico no encontrado");
@@ -48,14 +46,14 @@ public class DoctorsController : ControllerBase
         return Ok(new {doctor.Name, doctor.LicenseNumber, SpecialityName = doctor.Speciality.Name});
     }
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete([FromRoute] Guid id)
+    public async Task<IActionResult> DeleteDoctorById([FromRoute] Guid id)
     {
-        var doctor = await _persistence.GetDoctorAsync(id);
+        var doctor = _persistence.GetDoctor(id);
         if(doctor == null || doctor.IsActive == false)
         {
             return NotFound("Médico no encontrado");
         }
-        await _persistence.DeleteDoctorAsync(doctor);
+        _persistence.DeleteDoctor(doctor);
         return NoContent();
     }
 }

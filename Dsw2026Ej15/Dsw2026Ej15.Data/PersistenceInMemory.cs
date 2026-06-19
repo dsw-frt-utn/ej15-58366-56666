@@ -13,11 +13,16 @@ public class PersistenceInMemory: IPersistence
     private List<Speciality> _specialities = [];
     private List<Doctor> _doctors = [];
 
-    private async Task LoadSpecialitiesAsync()
+    public PersistenceInMemory()
+    {
+        LoadSpecialities();
+    }
+
+    private void LoadSpecialities()
     {
         try {
             string jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Sources" ,"specialities.json");
-            var json = await File.ReadAllTextAsync(jsonPath);
+            var json = File.ReadAllText(jsonPath);
             var specialities = JsonSerializer.Deserialize<List<SpecialityDto>>(json, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }) ?? [];
             _specialities = [.. specialities.Select(s => new Speciality(s.Name, s.Description, s.Id))];
         }
@@ -26,21 +31,12 @@ public class PersistenceInMemory: IPersistence
             throw new InvalidOperationException("Error al cargar las especialidades", ex);
         }
     }
-    public Task<List<Doctor>> GetDoctorsAsync() => Task.FromResult(_doctors);
-    public Task<List<Speciality>> GetSpecialitiesAsync() => Task.FromResult(_specialities);
+    public List<Doctor> GetDoctors() => _doctors;
+    public List<Speciality> GetSpecialities() => _specialities;
 
-    public Task CreateDoctorAsync(Doctor doctor)
-    {
-        _doctors.Add(doctor);
-        return Task.CompletedTask;
-    }
-    public Task<Doctor?> GetDoctorAsync(Guid Id) => Task
-        .FromResult(_doctors.FirstOrDefault(d => d.Id == Id));
-    public Task<Speciality?> GetSpecialityAsync(Guid Id) => Task.FromResult(_specialities.SingleOrDefault(s => s.Id == Id));
+    public void SaveDoctor(Doctor doctor) => _doctors.Add(doctor);
+    public Doctor? GetDoctor(Guid Id) => _doctors.FirstOrDefault(d => d.Id == Id);
+    public Speciality? GetSpeciality(Guid Id) => _specialities.SingleOrDefault(s => s.Id == Id);
 
-    public Task DeleteDoctorAsync(Doctor doctor)
-    {
-        doctor.IsActive = false;
-        return Task.CompletedTask;
-    }
+    public void DeleteDoctor(Doctor doctor) => doctor.IsActive = false;
 }

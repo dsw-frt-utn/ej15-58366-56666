@@ -18,30 +18,27 @@ public class DoctorsController : AppController
     public async Task<IActionResult> CreateDoctor([FromBody] DoctorModel.Request request)
     {
         if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.LicenseNumber))
-          { 
+        { 
             throw new ValidationException("Nombre y Matricula son requeridos");
-           }
-
-        var speciality = _persistence.GetSpeciality(request.SpecialityId);
+        }
+        var speciality = await _persistence.GetSpecialityById(request.SpecialityId);
         if (speciality == null)
         {   
             throw new ValidationException("Especialidad no Existe");
         }
-       
-        
-        _persistence.SaveDoctor(new Doctor(request.Name, request.LicenseNumber, speciality));
+        await _persistence.SaveDoctor(new Doctor(request.Name, request.LicenseNumber, speciality));
         return Created();
     }
     [HttpGet]
     public async Task<IActionResult> GetDoctors()
     {
-        var doctors = _persistence.GetDoctors().Where(d => d.IsActive == true);
+        var doctors = await _persistence.GetAllDoctors();
         return Ok(doctors);
     }
     [HttpGet("{id}")]
     public async Task<IActionResult> GetDoctorById([FromRoute] Guid id)
     {
-        var doctor = _persistence.GetDoctor(id);
+        var doctor = await _persistence.GetDoctorById(id);
         if(doctor == null || doctor.IsActive == false)
         {
             throw new NotFoundException("Médico no encontrado o inactivo.");
@@ -51,12 +48,12 @@ public class DoctorsController : AppController
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteDoctorById([FromRoute] Guid id)
     {
-        var doctor = _persistence.GetDoctor(id);
+        var doctor = await _persistence.GetDoctorById(id);
         if(doctor == null || doctor.IsActive == false)
         {
-            throw new NotFoundException("Médico no encontrado o ya se encuentra inactivo.");
+            throw new NotFoundException("Médico no encontrado o inactivo.");
         }
-        _persistence.DeleteDoctor(doctor);
+        await _persistence.DeleteDoctor(doctor);
         return NoContent();
     }
 }

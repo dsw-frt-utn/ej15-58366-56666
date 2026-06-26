@@ -6,10 +6,15 @@ namespace Dsw2026Ej15.Domain.Entities;
 
 public class Doctor: BaseEntity
 {
-    public string? Name { get; init; }
-    public string? LicenseNumber { get; init; }
-    public bool IsActive { get; set; }
-    public Speciality Speciality { get; init; }
+    public string Name { get; init; }
+    public string LicenseNumber { get; init; }
+    public bool IsActive { get; private set; }
+
+    public Guid? SpecialityId { get; set; }
+    public Speciality? Speciality { get; private set; }
+
+    private Doctor()
+    { }
 
     public Doctor(string? name, string? licenseNumber, Speciality speciality, Guid? id = null) : base(id)
     {
@@ -17,5 +22,10 @@ public class Doctor: BaseEntity
         LicenseNumber = licenseNumber;
         IsActive = true;
         Speciality = speciality;
+    }
+
+    public void Deactivate()
+    {
+        IsActive = false;
     }
 }

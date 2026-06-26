@@ -31,12 +31,30 @@ public class PersistenceInMemory: IPersistence
             throw new InvalidOperationException("Error al cargar las especialidades", ex);
         }
     }
-    public List<Doctor> GetDoctors() => _doctors;
-    public List<Speciality> GetSpecialities() => _specialities;
+    public async Task<IEnumerable<Doctor>> GetAllDoctors()
+    {
+        return _doctors.Where(d => d.IsActive);
+    }
+    public async Task<Doctor?> GetDoctorById(Guid id)
+    {
+        return _doctors.SingleOrDefault(d => d.Id == id && d.IsActive);
 
-    public void SaveDoctor(Doctor doctor) => _doctors.Add(doctor);
-    public Doctor? GetDoctor(Guid Id) => _doctors.FirstOrDefault(d => d.Id == Id);
-    public Speciality? GetSpeciality(Guid Id) => _specialities.SingleOrDefault(s => s.Id == Id);
+    }
 
-    public void DeleteDoctor(Doctor doctor) => doctor.IsActive = false;
+    public async Task<Speciality?> GetSpecialityById(Guid id)
+    {
+        return _specialities.SingleOrDefault(e => e.Id == id);
+    }
+
+    public async Task SaveDoctor (Doctor doctor)
+    {
+        _doctors.Add(doctor);
+    }
+
+    public async Task UpdateDoctor(Doctor doctor)
+    {
+        _doctors.Remove(doctor);
+        _doctors.Add(doctor);
+
+    }
 }

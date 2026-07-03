@@ -8,7 +8,7 @@ using Dsw2026Ej15.Data.Dtos;
 
 namespace Dsw2026Ej15.Data;
 
-public class PersistenceInMemory: IPersistence
+public class PersistenceInMemory
 {
     private List<Speciality> _specialities = [];
     private List<Doctor> _doctors = [];
@@ -31,30 +31,5 @@ public class PersistenceInMemory: IPersistence
             throw new InvalidOperationException("Error al cargar las especialidades", ex);
         }
     }
-    public async Task<IEnumerable<Doctor>> GetAllDoctors()
-    {
-        return _doctors.Where(d => d.IsActive);
-    }
-    public async Task<Doctor?> GetDoctorById(Guid id)
-    {
-        return _doctors.SingleOrDefault(d => d.Id == id && d.IsActive);
-
-    }
-
-    public async Task<Speciality?> GetSpecialityById(Guid id)
-    {
-        return _specialities.SingleOrDefault(e => e.Id == id);
-    }
-
-    public async Task SaveDoctor (Doctor doctor)
-    {
-        _doctors.Add(doctor);
-    }
-
-    public async Task UpdateDoctor(Doctor doctor)
-    {
-        _doctors.Remove(doctor);
-        _doctors.Add(doctor);
-
-    }
+   
 }

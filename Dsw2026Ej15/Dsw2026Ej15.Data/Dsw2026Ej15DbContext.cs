@@ -16,6 +16,28 @@ namespace Dsw2026Ej15.Data
 
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Doctor>(e =>
+            {
+                e.ToTable("Doctors");
+                e.Property(p => p.Name).HasMaxLength(100);
+                e.Property(p => p.LicenseNumber).HasMaxLength(100);
+                e.HasIndex(p => p.LicenseNumber).IsUnique();
+
+            });
+
+            modelBuilder.Entity<Speciality>(e =>
+            {
+                e.ToTable("Specialities");
+                e.Property(p => p.Name).HasMaxLength(100).IsRequired();
+                e.Property(p => p.Description).HasMaxLength(300).IsRequired();
+                
+            });
+
+
+        }
     }
 }

@@ -13,17 +13,21 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        var connectionsString = " Data Source = (localdb)\\MSSQLLocalDB; Integrated Security = True; Connect Timeout = 30; Encrypt = True; Trust Server Certificate = true" ;
+        var connectionString = " Data Source = (localdb)\\MSSQLLocalDB;Database=DSW2026Ej15; Integrated Security = True; Connect Timeout = 30; Encrypt = True; Trust Server Certificate = true" ;
+        
+        //Add services to the container
         builder.Services.AddDbContext<Dsw2026Ej15DbContext>(options=>
         {
-            options.UseSqlServer();
+            options.UseSqlServer(connectionString);
         });
         builder.Services.AddControllers();
         builder.Services.AddSwaggerGen();
-        builder.Services.AddSingleton<IPersistence, PersistenceInMemory>();
+        builder.Services.AddScoped<IPersistence, PersistenceEf>();
         builder.Services.AddHealthChecks();
+
         var app = builder.Build();
 
+        //Configure the HTTP request pipeline
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();

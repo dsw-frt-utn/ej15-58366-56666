@@ -16,7 +16,7 @@ public class Doctor: BaseEntity
     private Doctor()
     { }
 
-    public Doctor(string? name, string? licenseNumber, Speciality speciality, Guid? id = null) : base(id)
+    public Doctor(string name, string licenseNumber, Speciality speciality, Guid? id = null) : base(id)
     {
         Name = name;
         LicenseNumber = licenseNumber;
